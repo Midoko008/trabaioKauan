@@ -1,7 +1,8 @@
 /* Reset básico e fonte */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
+  background-color: #f5f5f5;
+  color: #111;
   margin: 0;
   padding: 0;
 }
@@ -11,7 +12,7 @@ body {
   max-width: 600px;
   margin: 40px auto;
   padding: 30px;
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
@@ -19,7 +20,7 @@ body {
 /* Títulos */
 h1, h2 {
   text-align: center;
-  color: #333;
+  color: #2c2c4a;
 }
 
 /* Formulário */
@@ -34,10 +35,12 @@ h1, h2 {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  background-color: #fff;
+  color: #000;
 }
 
 .formulario button {
-  background-color: #007bff;
+  background-color: #6f42c1;
   color: white;
   padding: 10px;
   border: none;
@@ -48,13 +51,12 @@ h1, h2 {
 }
 
 .formulario button:hover {
-  background-color: #0056b3;
+  background-color: #5a32a3;
 }
 
 /* Página Inicial */
 .pagina-inicial {
   padding: 20px;
-  font-family: Arial, sans-serif;
   background-color: #f5f5f5;
   min-height: 100vh;
 }
@@ -79,7 +81,7 @@ h1, h2 {
 
 /* Botão perfil */
 .botao-perfil {
-  background-color: #007bff;
+  background-color: #000;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -90,12 +92,12 @@ h1, h2 {
 }
 
 .botao-perfil:hover {
-  background-color: #0056b3;
+  background-color: #222;
 }
 
 /* Botão adicionar produto */
 .botao-adicionar {
-  background-color: #28a745;
+  background-color: #6f42c1;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -106,13 +108,13 @@ h1, h2 {
 }
 
 .botao-adicionar:hover {
-  background-color: #1e7e34;
+  background-color: #5a32a3;
 }
 
 /* Botão do carrinho no topo */
 .botao-carrinho.topo {
-  background-color: #ffc107;
-  color: #000;
+  background-color: #000;
+  color: #fff;
   border: none;
   padding: 10px 16px;
   border-radius: 6px;
@@ -125,7 +127,7 @@ h1, h2 {
 }
 
 .botao-carrinho.topo:hover {
-  background-color: #e0a800;
+  background-color: #222;
 }
 
 /* Ícone do carrinho no topo */
@@ -148,15 +150,14 @@ h1, h2 {
 
 /* Card individual de produto */
 .card-produto {
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 15px 15px 40px 15px;
   width: 220px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s;
   overflow: visible;
-  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -171,7 +172,6 @@ h1, h2 {
 /* Imagem do produto */
 .imagem-produto {
   width: 100%;
-  height: auto;
   object-fit: contain;
   border-radius: 4px;
   margin-bottom: 10px;
@@ -182,17 +182,16 @@ h1, h2 {
 /* Nome do produto */
 .card-produto h3 {
   font-size: 18px;
-  color: #222;
-  margin: 0 0 8px 0;
+  color: #111;
   text-align: center;
 }
 
 /* Preço do produto */
 .card-produto p {
   font-size: 16px;
-  color: #555;
-  margin: 0;
+  color: #333;
   font-weight: bold;
+  text-align: center;
 }
 
 /* Botão de adicionar ao carrinho dentro do card */
@@ -200,7 +199,7 @@ h1, h2 {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background-color: #ffc107;
+  background-color: #6f42c1;
   border: none;
   padding: 6px 8px;
   border-radius: 50%;
@@ -212,37 +211,17 @@ h1, h2 {
 }
 
 .botao-carrinho.card:hover {
-  background-color: #e0a800;
-}
-
-/* Ícone do carrinho dentro do card */
-.botao-carrinho.card .icone-carrinho {
-  width: 20px;
-  height: 20px;
-  stroke-width: 2;
-  pointer-events: none;
+  background-color: #5a32a3;
 }
 
 /* Botão remover do carrinho */
 .botao-carrinho.remover {
-  background-color: #ff4d4d;
-  border: none;
-  border-radius: 50%;
-  padding: 10px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
+  background-color: #000;
+  color: white;
 }
 
 .botao-carrinho.remover:hover {
-  transform: scale(1.1);
-  background-color: #e60000;
+  background-color: #6f42c1;
 }
 
 .botao-carrinho.remover .icone-carrinho {
@@ -254,7 +233,7 @@ h1, h2 {
   padding: 40px;
   max-width: 600px;
   margin: 50px auto 0 auto;
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
   text-align: center;
@@ -263,17 +242,17 @@ h1, h2 {
 .perfil-titulo {
   text-align: center;
   margin-bottom: 25px;
-  color: #333;
+  color: #2c2c4a;
 }
 
 .perfil-box p {
   font-size: 16px;
   margin-bottom: 12px;
-  color: #555;
+  color: #444;
 }
 
 .perfil-box strong {
-  color: #000;
+  color: #111;
 }
 
 .botao-carrinho {
@@ -283,10 +262,12 @@ h1, h2 {
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.3s ease;
+  background-color: #6f42c1;
+  color: white;
 }
 
 .botao-carrinho:hover {
-  background-color: #e0a800;
+  background-color: #5a32a3;
 }
 
 /* Responsividade */
@@ -314,7 +295,7 @@ h1, h2 {
 }
 
 .carrinho-footer {
-  background-color: #fff;
+  background-color: #ffffff;
   padding: 20px 25px;
   margin-top: 40px;
   border-radius: 12px;
@@ -328,7 +309,7 @@ h1, h2 {
 .precoTotal {
   font-size: 28px !important;
   font-weight: 700;
-  color: #222;
+  color: #000;
   margin: 0;
   white-space: nowrap;
   flex-shrink: 0;
@@ -338,7 +319,18 @@ h1, h2 {
   min-width: 160px;
   text-align: center;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4);
+  background-color: #6f42c1;
+  color: white;
+  box-shadow: 0 2px 6px rgba(111, 66, 193, 0.4);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.confirmarCompra:hover {
+  background-color: #5a32a3;
 }
 
 .produtosPostados .card-produto {
@@ -358,11 +350,21 @@ h1, h2 {
 }
 
 .botao-perfil-salvar {
-  background-color: green;
+  background-color: #6f42c1;
+  color: white;
+}
+
+.botao-perfil-salvar:hover {
+  background-color: #5a32a3;
 }
 
 .botao-perfil-cancelar {
-  background-color: red;
+  background-color: #000;
+  color: white;
+}
+
+.botao-perfil-cancelar:hover {
+  background-color: #222;
 }
 
 /* === BARRA DE PESQUISA E CATEGORIA OTIMIZADAS === */
@@ -374,6 +376,8 @@ h1, h2 {
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 14px;
+  background-color: #fff;
+  color: #000;
   box-sizing: border-box;
   max-height: 36px;
 }
@@ -386,7 +390,8 @@ h1, h2 {
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 14px;
-  background-color: #f8f8f8;
+  background-color: #fff;
+  color: #000;
   box-sizing: border-box;
   max-height: 36px;
 }
@@ -403,14 +408,14 @@ h1, h2 {
 
 .filtros-container {
   display: flex;
-  gap: 12px;              /* Espaço entre os campos */
+  gap: 12px;
   margin-bottom: 20px;
-  flex-wrap: wrap;        /* Para empilhar em telas pequenas */
+  flex-wrap: wrap;
   justify-content: center;
 }
 
 .barra-pesquisa,
 .select-categoria {
-  flex: 1 1 200px;         /* Cresce, mas com mínimo de 200px */
-  max-width: 300px;        /* Limita o tamanho máximo */
+  flex: 1 1 200px;
+  max-width: 300px;
 }

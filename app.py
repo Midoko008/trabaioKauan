@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from models import db, Usuario, Produto, Carrinho, Categoria
+from models import db, Cozinheiro, Prato, Pedido, Tipo
 from datetime import datetime
 import bcrypt
 
@@ -8,12 +8,12 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuração do banco de dados MySQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://gutogames:SenhaF0rte!2025@localhost/usadores'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://KuanLefipe:SenhaFortona2035!@localhost/restaurante'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 # Função para obter o usuário logado a partir do header Authorization (Bearer <user_id>)
-def get_usuario_logado():
+def get_cozinheiro_logado():
     auth = request.headers.get('Authorization')
     if not auth:
         return None
@@ -22,21 +22,21 @@ def get_usuario_logado():
         if token_type.lower() != 'bearer':
             return None
         user_id_int = int(user_id)
-        return Usuario.query.get(user_id_int)
+        return Cozinheiro.query.get(user_id_int)
     except Exception:
         return None
 
 # --- Rotas Usuário ---
 
 @app.route('/cadastro', methods=['POST'])
-def cadastrar_usuario():
+def cadastrar_cozinheiro():
     dados = request.json
     try:
         nascimento = datetime.strptime(dados['data_nascimento'], '%Y-%m-%d').date()
     except (ValueError, KeyError):
         return jsonify({'erro': 'Data de nascimento inválida ou não informada'}), 400
 
-    idade = Usuario.calcular_idade(nascimento)
+    idade = Cozinheiro.calcular_idade(nascimento)
     senha = dados.get('senha', '')
     if not senha:
         return jsonify({'erro': 'Senha não informada'}), 400
@@ -44,7 +44,7 @@ def cadastrar_usuario():
     senha_bytes = senha.encode('utf-8')
     senha_criptografada = bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
 
-    novo_usuario = Usuario(
+    novo_cozinheiro = Cozinheiro(
         nome=dados.get('nome'),
         email=dados.get('email'),
         cep=dados.get('cep'),
@@ -56,7 +56,7 @@ def cadastrar_usuario():
     )
 
     try:
-        db.session.add(novo_usuario)
+        db.session.add(novo_cozinheiro)
         db.session.commit()
         return jsonify({'mensagem': 'Usuário cadastrado com sucesso!'}), 201
     except Exception:
@@ -66,58 +66,58 @@ def cadastrar_usuario():
 @app.route('/login', methods=['POST'])
 def login():
     dados = request.json
-    usuario = Usuario.query.filter_by(email=dados.get('email')).first()
+    cozinheiro = Cozinheiro.query.filter_by(email=dados.get('email')).first()
 
-    if usuario and bcrypt.checkpw(dados.get('senha', '').encode(), usuario.senha_hash.encode()):
+    if cozinheiro and bcrypt.checkpw(dados.get('senha', '').encode(), cozinheiro.senha_hash.encode()):
         return jsonify({
             'mensagem': 'Login bem-sucedido',
-            'usuario': {
-                'id': usuario.id,
-                'nome': usuario.nome,
-                'email': usuario.email,
-                'cep': usuario.cep,
-                'cpf': usuario.cpf,
-                'data_nascimento': usuario.data_nascimento.strftime('%Y-%m-%d'),
-                'idade': usuario.idade,
-                'tipo': usuario.tipo
+            'cozinheiro': {
+                'id': cozinheiro.id,
+                'nome': cozinheiro.nome,
+                'email': cozinheiro.email,
+                'cep': cozinheiro.cep,
+                'cpf': cozinheiro.cpf,
+                'data_nascimento': cozinheiro.data_nascimento.strftime('%Y-%m-%d'),
+                'idade': cozinheiro.idade,
+                'tipo': cozinheiro.tipo
             }
         }), 200
 
     return jsonify({'erro': 'E-mail ou senha inválidos'}), 401
 
-@app.route('/usuarios/<int:id>', methods=['GET'])
-def obter_usuario(id):
-    usuario = Usuario.query.get_or_404(id)
-    usuario_logado = get_usuario_logado()
-    if not usuario_logado:
+@app.route('/cozinheiros/<int:id>', methods=['GET'])
+def obter_cozinheiro(id):
+    cozinheiro = Cozinheiro.query.get_or_404(id)
+    cozinheiro_logado = get_cozinheiro_logado()
+    if not cozinheiro_logado:
         return jsonify({'erro': 'Usuário não autenticado'}), 401
 
-    if usuario_logado.id == usuario.id or usuario_logado.tipo == 'admin':
-        return jsonify(usuario.to_dict_completo())
+    if cozinheiro_logado.id == cozinheiro.id or cozinheiro_logado.tipo == 'admin':
+        return jsonify(cozinheiro.to_dict_completo())
     else:
-        return jsonify(usuario.to_dict_publico())
+        return jsonify(cozinheiro.to_dict_publico())
 
-@app.route('/usuarios/me', methods=['GET'])
+@app.route('/cozinheiros/me', methods=['GET'])
 def obter_meu_perfil():
-    usuario_logado = get_usuario_logado()
-    if not usuario_logado:
+    cozinheiro_logado = get_cozinheiro_logado()
+    if not cozinheiro_logado:
         return jsonify({'erro': 'Usuário não autenticado'}), 401
-    return jsonify(usuario_logado.to_dict_completo())
+    return jsonify(cozinheiro_logado.to_dict_completo())
 
-@app.route('/usuarios/<int:id>', methods=['PUT'])
-def atualizar_usuario(id):
-    usuario_logado = get_usuario_logado()
-    if not usuario_logado:
+@app.route('/cozinheiros/<int:id>', methods=['PUT'])
+def atualizar_cozinheiro(id):
+    cozinheiro_logado = get_cozinheiro_logado()
+    if not cozinheiro_logado:
         return jsonify({'erro': 'Usuário não autenticado'}), 401
-    if usuario_logado.id != id and usuario_logado.tipo != 'admin':
+    if cozinheiro_logado.id != id and cozinheiro_logado.tipo != 'admin':
         return jsonify({'erro': 'Acesso negado'}), 403
 
     dados = request.json
-    usuario = Usuario.query.get_or_404(id)
+    cozinheiro = Cozinheiro.query.get_or_404(id)
     if 'nome' in dados:
-        usuario.nome = dados['nome']
+        cozinheiro.nome = dados['nome']
     if 'email' in dados:
-        usuario.email = dados['email']
+        cozinheiro.email = dados['email']
 
     try:
         db.session.commit()
@@ -126,239 +126,224 @@ def atualizar_usuario(id):
         db.session.rollback()
         return jsonify({'erro': 'Erro ao atualizar usuário'}), 500
 
-# --- Rotas Categoria ---
+# --- Rotas tipo ---
 
-@app.route('/categorias', methods=['GET'])
-def listar_categorias():
-    categorias = Categoria.query.all()
-    return jsonify([{'id': c.id, 'nome': c.nome} for c in categorias])
+@app.route('/tipos', methods=['GET'])
+def listar_tipos():
+    tipos = Tipo.query.all()
+    return jsonify([{'id': c.id, 'nome': c.nome} for c in tipos])
 
-@app.route('/categorias', methods=['POST'])
-def criar_categoria():
+@app.route('/tipos', methods=['POST'])
+def criar_tipo():
     dados = request.json
     nome = dados.get('nome')
     if not nome:
-        return jsonify({'erro': 'Nome da categoria é obrigatório'}), 400
+        return jsonify({'erro': 'Nome da tipo é obrigatório'}), 400
 
-    existente = Categoria.query.filter_by(nome=nome).first()
+    existente = Tipo.query.filter_by(nome=nome).first()
     if existente:
-        return jsonify({'erro': 'Categoria já existe'}), 400
+        return jsonify({'erro': 'tipo já existe'}), 400
 
-    nova_categoria = Categoria(nome=nome)
+    nova_tipo = Tipo(nome=nome)
     try:
-        db.session.add(nova_categoria)
+        db.session.add(nova_tipo)
         db.session.commit()
-        return jsonify({'mensagem': 'Categoria criada', 'id': nova_categoria.id}), 201
+        return jsonify({'mensagem': 'tipo criada', 'id': nova_tipo.id}), 201
     except Exception:
         db.session.rollback()
-        return jsonify({'erro': 'Erro ao criar categoria'}), 500
+        return jsonify({'erro': 'Erro ao criar tipo'}), 500
 
-# --- Rotas Produto ---
+# --- Rotas prato ---
 
-@app.route('/produtos', methods=['GET'])
-def listar_produtos():
-    produtos = Produto.query.all()
-    lista = []
-    for p in produtos:
-        lista.append({
-            'id': p.id,
-            'nome': p.nome,
-            'preco': p.preco,
-            'imagem_url': p.imagem_url,
-            'estoque': p.estoque,
-            'categoria': {
-                'id': p.categoria.id if p.categoria else None,
-                'nome': p.categoria.nome if p.categoria else None
-            }
-        })
-    return jsonify(lista)
+@app.route('/pratos', methods=['GET'])
+def listar_pratos():
+    pratos = Prato.query.all()
+    return jsonify([{
+        'id': p.id,
+        'nome': p.nome,
+        'preco': p.preco,
+        'imagem_url': p.imagem_url,
+        'peso': p.peso,
+        'tipo': p.tipo.nome,
+        'cozinheiro': p.cozinheiro.nome
+    } for p in pratos])
 
-@app.route('/produtos/<int:id>', methods=['GET'])
-def obter_produto(id):
-    p = Produto.query.get(id)
+@app.route('/pratos/<int:id>', methods=['GET'])
+def obter_prato(id):
+    p = Prato.query.get(id)
     if not p:
-        return jsonify({'erro': 'Produto não encontrado'}), 404
+        return jsonify({'erro': 'prato não encontrado'}), 404
     return jsonify({
         'id': p.id,
         'nome': p.nome,
         'preco': p.preco,
         'imagem_url': p.imagem_url,
-        'estoque': p.estoque,
-        'categoria': {
-            'id': p.categoria.id if p.categoria else None,
-            'nome': p.categoria.nome if p.categoria else None
+        'peso': p.peso,
+        'tipo': {
+            'id': p.tipo.id if p.tipo else None,
+            'nome': p.tipo.nome if p.tipo else None
         },
-        'usuario': {
-            'id': p.usuario.id,
-            'nome': p.usuario.nome
+        'cozinheiro': {
+            'id': p.cozinheiro.id,
+            'nome': p.cozinheiro.nome
         }
     })
 
-@app.route('/produtos', methods=['POST'])
-def criar_produto():
-    usuario_logado = get_usuario_logado()
-    if not usuario_logado:
+@app.route('/pratos', methods=['POST'])
+def criar_prato():
+    cozinheiro_logado = get_cozinheiro_logado()
+    if not cozinheiro_logado:
         return jsonify({'erro': 'Usuário não autenticado'}), 401
 
     dados = request.json
     nome = dados.get('nome')
     preco = dados.get('preco')
     imagem_url = dados.get('imagem_url')
-    estoque = dados.get('estoque')
-    categoria_id = dados.get('categoria_id')
+    peso = dados.get('peso')
+    tipo_id = dados.get('tipo_id')
 
-    if not nome or preco is None or not imagem_url or estoque is None or not categoria_id:
+    if not nome or preco is None or not imagem_url or peso is None or not tipo_id:
         return jsonify({'erro': 'Dados incompletos'}), 400
 
     try:
         preco = float(preco)
-        estoque = int(estoque)
-        categoria_id = int(categoria_id)
-        if estoque <= 0:
-            return jsonify({'erro': 'Estoque deve ser maior que zero'}), 400
+        peso = float(peso)
+        tipo_id = int(tipo_id)
+        if peso <= 0:
+            return jsonify({'erro': 'Peso deve ser maior que zero'}), 400
     except (ValueError, TypeError):
-        return jsonify({'erro': 'Preço, estoque ou categoria inválidos'}), 400
+        return jsonify({'erro': 'Preço, peso ou tipo inválidos'}), 400
 
-    categoria = Categoria.query.get(categoria_id)
-    if not categoria:
-        return jsonify({'erro': 'Categoria não encontrada'}), 404
+    tipo = Tipo.query.get(tipo_id)
+    if not tipo:
+        return jsonify({'erro': 'tipo não encontrada'}), 404
 
-    novo_produto = Produto(
+    novo_prato = Prato(
         nome=nome,
         preco=preco,
         imagem_url=imagem_url,
-        estoque=estoque,
-        categoria_id=categoria_id,
-        usuario_id=usuario_logado.id
+        peso=peso,
+        tipo_id=tipo_id,
+        cozinheiro_id=cozinheiro_logado.id
     )
 
     try:
-        db.session.add(novo_produto)
+        db.session.add(novo_prato)
         db.session.commit()
-        return jsonify({'mensagem': 'Produto criado com sucesso!'}), 201
+        return jsonify({'mensagem': 'prato criado com sucesso!'}), 201
     except Exception:
         db.session.rollback()
-        return jsonify({'erro': 'Erro ao salvar produto'}), 500
+        return jsonify({'erro': 'Erro ao salvar prato'}), 500
 
-@app.route('/produtos/<int:id>', methods=['DELETE'])
-def deletar_produto(id):
-    usuario_logado = get_usuario_logado()
-    if not usuario_logado:
+@app.route('/pratos/<int:id>', methods=['DELETE'])
+def deletar_prato(id):
+    cozinheiro_logado = get_cozinheiro_logado()
+    if not cozinheiro_logado:
         return jsonify({'erro': 'Usuário não autenticado'}), 401
 
-    produto = Produto.query.get(id)
-    if not produto:
-        return jsonify({'erro': 'Produto não encontrado'}), 404
+    prato = Prato.query.get(id)
+    if not prato:
+        return jsonify({'erro': 'prato não encontrado'}), 404
 
-    if usuario_logado.id != produto.usuario_id and usuario_logado.tipo != 'admin':
+    if cozinheiro_logado.id != prato.cozinheiro_id and cozinheiro_logado.tipo != 'admin':
         return jsonify({'erro': 'Acesso negado'}), 403
 
     try:
-        Carrinho.query.filter_by(produto_id=id).delete()
-        db.session.delete(produto)
+        Pedido.query.filter_by(prato_id=id).delete()
+        db.session.delete(prato)
         db.session.commit()
-        return jsonify({'mensagem': 'Produto deletado com sucesso'}), 200
+        return jsonify({'mensagem': 'prato deletado com sucesso'}), 200
     except Exception:
         db.session.rollback()
-        return jsonify({'erro': 'Erro ao deletar produto'}), 500
+        return jsonify({'erro': 'Erro ao deletar prato'}), 500
 
-# --- Carrinho (sem usuário_id) ---
+# --- pedido (sem usuário_id) ---
 
-@app.route('/carrinho', methods=['POST'])
-def adicionar_ao_carrinho():
+@app.route('/pedido', methods=['POST'])
+def adicionar_ao_pedido():
     dados = request.json
-    produto_id = dados.get('produto_id')
-    produto = Produto.query.get(produto_id)
-    if not produto:
-        return jsonify({'erro': 'Produto não encontrado'}), 404
-    if produto.estoque <= 0:
-        return jsonify({'erro': 'Produto sem estoque'}), 400
+    prato_id = dados.get('prato_id')
+    prato = Prato.query.get(prato_id)
+    if not prato:
+        return jsonify({'erro': 'prato não encontrado'}), 404
 
     try:
-        novo_item = Carrinho(produto_id=produto.id)
-        produto.estoque -= 1
+        novo_item = Pedido(prato_id=prato.id)
         db.session.add(novo_item)
         db.session.commit()
-        return jsonify({'mensagem': 'Produto adicionado ao carrinho!'}), 201
-    except Exception as e:
+        return jsonify({'mensagem': 'prato adicionado ao pedido!'}), 201
+    except Exception:
         db.session.rollback()
-        return jsonify({'erro': 'Erro ao adicionar ao carrinho', 'detalhe': str(e)}), 500
+        return jsonify({'erro': 'Erro ao adicionar pedido'}), 500
 
-
-@app.route('/carrinho', methods=['GET'])
-def listar_carrinho():
-    itens = Carrinho.query.all()
-    produtos = []
-    valor_total = 0.0
+@app.route('/pedido', methods=['GET'])
+def listar_pedido():
+    itens = Pedido.query.all()
+    pedido = []
+    total = 0
 
     for item in itens:
-        p = Produto.query.get(item.produto_id)
-        if p:
-            valor_total += p.preco
-            produtos.append({
-                'id': p.id,
-                'nome': p.nome,
-                'preco': p.preco,
-                'imagem_url': p.imagem_url,
-                'estoque': p.estoque,
-                'categoria': {
-                    'id': p.categoria.id if p.categoria else None,
-                    'nome': p.categoria.nome if p.categoria else None
-                }
+        prato = Prato.query.get(item.prato_id)
+        if prato:
+            pedido.append({
+                'id': prato.id,
+                'nome': prato.nome,
+                'preco': prato.preco,
+                'imagem_url': prato.imagem_url,
+                'peso': prato.peso,
+                'tipo': prato.tipo.nome
             })
+            total += prato.preco
 
-    return jsonify({'produtos': produtos, 'valor_total': f"{valor_total:.2f}"})
+    return jsonify({'pratos': pedido, 'valor_total': total})
 
-@app.route('/carrinho/<int:produto_id>', methods=['DELETE'])
-def remover_do_carrinho(produto_id):
-    item = Carrinho.query.filter_by(produto_id=produto_id).first()
+@app.route('/pedido/<int:prato_id>', methods=['DELETE'])
+def remover_do_pedido(prato_id):
+    item = Pedido.query.filter_by(prato_id=prato_id).first()
     if not item:
-        return jsonify({'erro': 'Produto não está no carrinho'}), 404
+        return jsonify({'erro': 'prato não está no pedido'}), 404
 
     try:
-        produto = Produto.query.get(produto_id)
-        if produto:
-            produto.estoque += 1
         db.session.delete(item)
         db.session.commit()
-        return jsonify({'mensagem': 'Produto removido do carrinho!'}), 200
-    except Exception as e:
+        return jsonify({'mensagem': 'prato removido do pedido!'}), 200
+    except Exception:
         db.session.rollback()
-        return jsonify({'erro': 'Erro ao remover do carrinho', 'detalhe': str(e)}), 500
+        return jsonify({'erro': 'Erro ao remover prato'}), 500
 
-@app.route('/produtos/usuario/<int:usuario_id>', methods=['GET'])
-def produtos_por_usuario(usuario_id):
-    produtos = Produto.query.filter_by(usuario_id=usuario_id).all()
+@app.route('/pratos/cozinheiro/<int:cozinheiro_id>', methods=['GET'])
+def pratos_por_cozinheiro(cozinheiro_id):
+    pratos = Prato.query.filter_by(cozinheiro_id=cozinheiro_id).all()
     lista = []
-    for p in produtos:
+    for p in pratos:
         lista.append({
             'id': p.id,
             'nome': p.nome,
             'preco': p.preco,
             'imagem_url': p.imagem_url,
-            'estoque': p.estoque,
-            'categoria': {
-                'id': p.categoria.id if p.categoria else None,
-                'nome': p.categoria.nome if p.categoria else None
+            'peso': p.peso,
+            'tipo': {
+                'id': p.tipo.id if p.tipo else None,
+                'nome': p.tipo.nome if p.tipo else None
             }
         })
     return jsonify(lista)
 
 
-@app.route('/produtos/categoria/<int:categoria_id>', methods=['GET'])
-def produtos_por_categoria(categoria_id):
-    produtos = Produto.query.filter_by(categoria_id=categoria_id).all()
+@app.route('/pratos/tipo/<int:tipo_id>', methods=['GET'])
+def pratos_por_tipo(tipo_id):
+    pratos = Prato.query.filter_by(tipo_id=tipo_id).all()
     lista = []
-    for p in produtos:
+    for p in pratos:
         lista.append({
             'id': p.id,
             'nome': p.nome,
             'preco': p.preco,
             'imagem_url': p.imagem_url,
-            'estoque': p.estoque,
-            'categoria': {
-                'id': p.categoria.id if p.categoria else None,
-                'nome': p.categoria.nome if p.categoria else None
+            'peso': p.peso,
+            'tipo': {
+                'id': p.tipo.id if p.tipo else None,
+                'nome': p.tipo.nome if p.tipo else None
             }
         })
     return jsonify(lista)

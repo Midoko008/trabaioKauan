@@ -12,14 +12,14 @@ export default function Item() {
 
   useEffect(() => {
     // Pega o usuário logado do localStorage (objeto completo)
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const usuario = JSON.parse(localStorage.getItem('cozinheiro'));
     if (!usuario) {
       navigate('/login');
       return;
     }
     setUsuarioLogado(usuario);
 
-    fetch(`http://localhost:5000/produtos/${id}`)
+    fetch(`http://localhost:5000/pratos/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Produto não encontrado');
         return res.json();
@@ -37,7 +37,7 @@ export default function Item() {
   useEffect(() => {
     if (!usuarioLogado) return;
 
-    fetch('http://localhost:5000/carrinho', {
+    fetch('http://localhost:5000/pedido', {
       headers: {
         Authorization: `Bearer ${usuarioLogado.id}`
       }
@@ -56,7 +56,7 @@ export default function Item() {
   function deletarProduto() {
     if (!window.confirm('Tem certeza que deseja deletar este produto?')) return;
 
-    fetch(`http://localhost:5000/produtos/${produto.id}`, {
+    fetch(`http://localhost:5000/pratos/${produto.id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${usuarioLogado.id}`
@@ -73,7 +73,7 @@ export default function Item() {
   }
 
   // Permissão para deletar: se o id do usuário logado é igual ao id do usuário que postou o produto
-  const podeDeletar = produto.usuario && usuarioLogado && (produto.usuario.id === usuarioLogado.id);
+  const podeDeletar = produto.cozinheiro && usuarioLogado && (produto.cozinheiro.id === usuarioLogado.id);
 
   return (
     <div className="pagina-inicial" style={{ maxWidth: 600, margin: '40px auto' }}>
@@ -86,7 +86,10 @@ export default function Item() {
         alt={produto.nome}
         style={{ width: '100%', height: 'auto', borderRadius: 8, marginBottom: 20 }}
       />
-      <p><strong>Preço:</strong> R$ {produto.preco.toFixed(2)} <strong>Estoque: {produto.estoque}</strong></p>
+<p>
+  <strong>Preço:</strong> R$ {produto.preco.toFixed(2)}{' '}
+  <strong>Peso: {produto.peso >= 1000 ? (produto.peso / 1000).toFixed(2) + ' kg' : produto.peso + ' g'}</strong>
+</p>
 
       {produto.usuario && (
         <p>
@@ -104,13 +107,13 @@ export default function Item() {
         <button
           className="botao-perfil"
           onClick={() => {
-            fetch('http://localhost:5000/carrinho', {
+            fetch('http://localhost:5000/pedido', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${usuarioLogado.id}`
               },
-              body: JSON.stringify({ produto_id: produto.id })
+              body: JSON.stringify({ prato_id: produto.id })
             })
               .then(res => res.json())
               .then(data => {
@@ -120,7 +123,7 @@ export default function Item() {
               .catch(() => alert('Erro ao adicionar ao carrinho'));
           }}
         >
-          Adicionar ao Carrinho
+          Adicionar aos pedidos
         </button>
       )}
 
@@ -128,7 +131,7 @@ export default function Item() {
         <button
           className="botao-perfil"
           onClick={() => {
-            fetch(`http://localhost:5000/carrinho/${produto.id}`, {
+            fetch(`http://localhost:5000/pedido/${produto.id}`, {
               method: 'DELETE',
               headers: {
                 Authorization: `Bearer ${usuarioLogado.id}`
@@ -143,7 +146,7 @@ export default function Item() {
           }}
           style={{ backgroundColor: '#dc3545' }}
         >
-          Remover do Carrinho
+          Remover dos pedidos
         </button>
       )}
 
@@ -153,7 +156,7 @@ export default function Item() {
           style={{ backgroundColor: '#b22222', marginTop: 20 }}
           onClick={deletarProduto}
         >
-          Deletar Produto
+          Jogar fora
         </button>
       )}
     </div>

@@ -6,7 +6,7 @@ export default function AdicionarProduto() {
   const [nome, setNome] = useState('');
   const [preco, setPreco] = useState('');
   const [imagemUrl, setImagemUrl] = useState('');
-  const [estoque, setEstoque] = useState(1);
+  const [peso, setPeso] = useState(1); // atualizado de estoque para peso
   const [categoriaId, setCategoriaId] = useState('');
   const [categorias, setCategorias] = useState([]);
   const [novaCategoria, setNovaCategoria] = useState('');
@@ -14,10 +14,10 @@ export default function AdicionarProduto() {
   const navigate = useNavigate();
   const categoriaBoxRef = useRef(null);
 
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const usuario = JSON.parse(localStorage.getItem('cozinheiro'));
 
   useEffect(() => {
-    fetch('http://localhost:5000/categorias')
+    fetch('http://localhost:5000/tipos')
       .then(res => res.json())
       .then(data => setCategorias(data))
       .catch(err => console.error('Erro ao buscar categorias:', err));
@@ -40,7 +40,7 @@ export default function AdicionarProduto() {
       return;
     }
 
-    fetch('http://localhost:5000/categorias', {
+    fetch('http://localhost:5000/tipos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome: novaCategoria })
@@ -65,7 +65,7 @@ export default function AdicionarProduto() {
       return;
     }
 
-    fetch('http://localhost:5000/produtos', {
+    fetch('http://localhost:5000/pratos', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,8 +75,8 @@ export default function AdicionarProduto() {
         nome,
         preco: parseFloat(preco),
         imagem_url: imagemUrl,
-        estoque: parseInt(estoque),
-        categoria_id: parseInt(categoriaId)
+        peso: parseInt(peso), // atualizado
+        tipo_id: parseInt(categoriaId)
       })
     })
       .then(res => {
@@ -97,7 +97,14 @@ export default function AdicionarProduto() {
         <input type="text" placeholder="Nome do Produto" value={nome} onChange={e => setNome(e.target.value)} required />
         <input type="number" step="0.01" placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} required />
         <input type="url" placeholder="URL da Imagem" value={imagemUrl} onChange={e => setImagemUrl(e.target.value)} required />
-        <input type="number" placeholder="Estoque" value={estoque} min={1} onChange={e => setEstoque(parseInt(e.target.value) || 1)} required />
+        <input
+          type="number"
+          placeholder="Peso (em gramas)"
+          value={peso}
+          min={1}
+          onChange={e => setPeso(parseInt(e.target.value) || 1)}
+          required
+        />
 
         <div style={{ marginTop: 20 }}>
           <button type="button" onClick={() => setMostrarCategorias(!mostrarCategorias)} style={{ padding: '8px 12px', borderRadius: 6 }}>

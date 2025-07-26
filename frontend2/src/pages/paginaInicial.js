@@ -10,20 +10,20 @@ export default function PaginaInicial() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/categorias')
+    fetch('http://localhost:5000/tipos')
       .then(res => res.json())
       .then(data => setCategorias(data))
       .catch(err => console.error('Erro ao buscar categorias:', err));
   }, []);
 
   useEffect(() => {
-    let url = 'http://localhost:5000/produtos';
+    let url = 'http://localhost:5000/pratos';
 
     const termo = filtro.trim();
     if (termo) {
-      url = `http://localhost:5000/produtos/buscar?q=${encodeURIComponent(termo)}`;
+      url = `http://localhost:5000/pratos/buscar?q=${encodeURIComponent(termo)}`;
     } else if (categoriaSelecionada) {
-      url = `http://localhost:5000/produtos/categoria/${categoriaSelecionada}`;
+      url = `http://localhost:5000/pratos/tipo/${categoriaSelecionada}`;
     }
 
     fetch(url)
@@ -40,7 +40,7 @@ export default function PaginaInicial() {
   }
 
   function abrirDetalhes(id) {
-    navigate(`/produto/${id}`);
+    navigate(`/pratos/${id}`);
   }
 
   function irParaAdicionarProduto() {
@@ -51,12 +51,12 @@ export default function PaginaInicial() {
     navigate('/carrinho');
   }
 
-  function adicionarAoCarrinho(e, produtoId) {
+  function adicionarAoCarrinho(e, pratoId) {
     e.stopPropagation();
-    fetch('http://localhost:5000/carrinho', {
+    fetch('http://localhost:5000/pedido', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ produto_id: produtoId }),
+      body: JSON.stringify({ prato_id: pratoId }),
     })
       .then(res => res.json())
       .then(data => alert(data.mensagem || data.erro))
@@ -66,7 +66,7 @@ export default function PaginaInicial() {
   return (
     <div className="pagina-inicial">
       <header className="header">
-        <h1>Feed de Produtos</h1>
+        <h1>Feed de Pratos</h1>
         <div className="botoes-topo">
           <button className="botao-perfil" onClick={irParaPerfil}>Ver Perfil</button>
           <button className="botao-adicionar" onClick={irParaAdicionarProduto}>Adicionar Produto</button>
@@ -74,13 +74,20 @@ export default function PaginaInicial() {
             className="botao-carrinho topo"
             onClick={irParaCarrinho}
             aria-label="Ver carrinho"
-            title="Ver carrinho"
+            title="Ver pedidos"
           >
-            <svg className="icone-carrinho" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
+<svg
+  className="icone-carrinho"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width="24"
+  height="24"
+  fill="currentColor"
+>
+  <path d="M4 36c0 11.05 8.95 20 20 20h16c11.05 0 20-8.95 20-20H4z" />
+  <path d="M20 4s2 4 0 8 2 8 2 8M32 4s2 4 0 8 2 8 2 8M44 4s2 4 0 8 2 8 2 8" stroke="currentColor" strokeWidth="2" fill="none"/>
+</svg>
+
           </button>
         </div>
       </header>
@@ -89,7 +96,7 @@ export default function PaginaInicial() {
       <div className="filtros-container">
       <input
         type="text"
-        placeholder="Buscar produtos pelo nome..."
+        placeholder="Buscar pratos pelo nome..."
         value={filtro}
         onChange={e => {
           setFiltro(e.target.value);
@@ -107,7 +114,7 @@ export default function PaginaInicial() {
         }}
         className="select-categoria"
       >
-        <option value="">Filtrar por categoria...</option>
+        <option value="">Filtrar por tipo...</option>
         {categorias.map(c => (
           <option key={c.id} value={c.id}>{c.nome}</option>
         ))}
@@ -116,7 +123,7 @@ export default function PaginaInicial() {
 
       <div className="lista-produtos">
         {produtosFiltrados.length === 0 ? (
-          <p>Nenhum produto encontrado.</p>
+          <p>Nenhum prato encontrado.</p>
         ) : (
           produtosFiltrados.map(produto => (
             <div
@@ -139,24 +146,20 @@ export default function PaginaInicial() {
                 className="botao-carrinho card"
                 onClick={(e) => adicionarAoCarrinho(e, produto.id)}
                 aria-label={`Adicionar ${produto.nome} ao carrinho`}
-                title="Adicionar ao carrinho"
+                title="Adicionar aos pedidos"
               >
-                <svg
-                  className="icone-carrinho"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  width="20"
-                  height="20"
-                >
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
+<svg
+  className="icone-carrinho"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width="24"
+  height="24"
+  fill="currentColor"
+>
+  <path d="M4 36c0 11.05 8.95 20 20 20h16c11.05 0 20-8.95 20-20H4z" />
+  <path d="M20 4s2 4 0 8 2 8 2 8M32 4s2 4 0 8 2 8 2 8M44 4s2 4 0 8 2 8 2 8" stroke="currentColor" strokeWidth="2" fill="none"/>
+</svg>
+
               </button>
             </div>
           ))

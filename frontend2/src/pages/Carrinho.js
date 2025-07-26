@@ -7,12 +7,11 @@ export default function Carrinho() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Carrega os produtos do carrinho
   useEffect(() => {
-    fetch('http://localhost:5000/carrinho')
+    fetch('http://localhost:5000/pedido')
       .then(res => res.json())
       .then(data => {
-        setProdutos(data.produtos || []);
+        setProdutos(data.pratos || []);
         setValorTotal(data.valor_total || '0.00');
         setLoading(false);
       })
@@ -22,10 +21,10 @@ export default function Carrinho() {
       });
   }, []);
 
-  function remover_do_carrinho(e, produtoId) {
+  function remover_do_carrinho(e, pratoId) {
     e.stopPropagation();
 
-    fetch(`http://localhost:5000/carrinho/${produtoId}`, {
+    fetch(`http://localhost:5000/pedido/${pratoId}`, {
       method: 'DELETE'
     })
       .then(res => res.json())
@@ -34,7 +33,7 @@ export default function Carrinho() {
 
         if (data.mensagem) {
           const novaLista = [...produtos];
-          const index = novaLista.findIndex(p => p.id === produtoId);
+          const index = novaLista.findIndex(p => p.id === pratoId);
           if (index !== -1) {
             novaLista.splice(index, 1);
             setProdutos(novaLista);
@@ -44,26 +43,34 @@ export default function Carrinho() {
           }
         }
       })
-      .catch(() => alert('Erro ao remover do carrinho'));
+      .catch(() => alert('Erro ao remover dos pedidos'));
   }
 
-  if (loading) return <div>Carregando carrinho...</div>;
+  function formatarPeso(peso) {
+    if (peso >= 1000) {
+      return `${(peso / 1000).toFixed(2)} kg`;
+    }
+    return `${peso} g`;
+  }
+
+  if (loading) return <div>Carregando pedidos...</div>;
 
   return (
     <div className="pagina-inicial">
       <button className="botao-perfil" onClick={() => navigate('/paginaInicial')}>
         Voltar
       </button>
-      <h1>Carrinho de Compras</h1>
+      <h1>Seus Pedidos</h1>
 
       <div className="lista-produtos">
-        {produtos.length === 0 && <p>Seu carrinho está vazio.</p>}
+        {produtos.length === 0 && <p>Você não pediu nada ainda</p>}
 
         {produtos.map((produto) => (
           <div key={produto.id} className="card-produto">
             <img src={produto.imagem_url} alt={produto.nome} className="imagem-produto" />
             <h3>{produto.nome}</h3>
             <p>Preço: R$ {produto.preco.toFixed(2)}</p>
+            <p>Peso: {formatarPeso(produto.peso)}</p>
 
             <button
               className="botao-carrinho remover"

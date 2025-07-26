@@ -3,8 +3,8 @@ from datetime import date
 
 db = SQLAlchemy()
 
-class Usuario(db.Model):
-    __tablename__ = 'usuario'
+class Cozinheiro(db.Model):
+    __tablename__ = 'cozinheiros'
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
@@ -16,7 +16,7 @@ class Usuario(db.Model):
     senha_hash = db.Column(db.Text)
     tipo = db.Column(db.String(20), default='comum')
 
-    produtos = db.relationship('Produto', backref='usuario')
+    pratos = db.relationship('Prato', backref='cozinheiro')
 
     @staticmethod
     def calcular_idade(data_nascimento):
@@ -43,42 +43,42 @@ class Usuario(db.Model):
             'idade': self.idade
         }
 
-class Categoria(db.Model):
-    __tablename__ = 'categoria'
+class Tipo(db.Model):
+    __tablename__ = 'tipo'
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False, unique=True)
 
-    produtos = db.relationship('Produto', back_populates='categoria', cascade='all, delete-orphan')
+    pratos = db.relationship('Prato', back_populates='tipo', cascade='all, delete-orphan')
 
     def __repr__(self):
-        return f'<Categoria {self.nome}>'
+        return f'<Tipo {self.nome}>'
 
-class Produto(db.Model):
-    __tablename__ = 'produtos'
+class Prato(db.Model):
+    __tablename__ = 'pratos'
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     preco = db.Column(db.Float, nullable=False)
     imagem_url = db.Column(db.String(255))
-    estoque = db.Column(db.Integer, nullable=False)
+    peso = db.Column(db.Integer, nullable=False)
 
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    categoria_id = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=True)
+    cozinheiro_id = db.Column(db.Integer, db.ForeignKey('cozinheiros.id'), nullable=False)
+    tipo_id = db.Column(db.Integer, db.ForeignKey('tipo.id'), nullable=True)
 
-    categoria = db.relationship('Categoria', back_populates='produtos')
-    carrinho_items = db.relationship('Carrinho', back_populates='produto', cascade='all, delete-orphan')
+    tipo = db.relationship('Tipo', back_populates='pratos')
+    pedidos = db.relationship('Pedido', back_populates='prato', cascade='all, delete-orphan')
 
     def __repr__(self):
-        return f'<Produto {self.nome}>'
+        return f'<Prato {self.nome}>'
 
-class Carrinho(db.Model):
-    __tablename__ = 'carrinho'
+class Pedido(db.Model):
+    __tablename__ = 'pedido'
 
     id = db.Column(db.Integer, primary_key=True)
-    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=False)
+    prato_id = db.Column(db.Integer, db.ForeignKey('pratos.id'), nullable=False)
 
-    produto = db.relationship('Produto', back_populates='carrinho_items')
+    prato = db.relationship('Prato', back_populates='pedidos')
 
     def __repr__(self):
-        return f'<Carrinho produto_id={self.produto_id}>'
+        return f'<Pedido prato_id={self.prato_id}>'

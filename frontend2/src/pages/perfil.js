@@ -13,7 +13,7 @@ export default function Perfil() {
   const [novoEmail, setNovoEmail] = useState('');
 
   useEffect(() => {
-    const userFromStorage = JSON.parse(localStorage.getItem('usuario'));
+    const userFromStorage = JSON.parse(localStorage.getItem('cozinheiro'));
     if (!userFromStorage) {
       navigate('/login');
       return;
@@ -22,8 +22,8 @@ export default function Perfil() {
     setUsuarioLogado(userFromStorage);
 
     const urlUsuario = id
-      ? `http://localhost:5000/usuarios/${id}`
-      : `http://localhost:5000/usuarios/me`;
+      ? `http://localhost:5000/cozinheiros/${id}`
+      : `http://localhost:5000/cozinheiros/me`;
 
     fetch(urlUsuario, {
       headers: {
@@ -42,7 +42,7 @@ export default function Perfil() {
       .catch(err => console.error("Erro ao buscar dados do perfil", err));
 
     const userIdParaProdutos = id || userFromStorage.id;
-    fetch(`http://localhost:5000/produtos/usuario/${userIdParaProdutos}`)
+    fetch(`http://localhost:5000/pratos/cozinheiro/${userIdParaProdutos}`)
       .then(res => res.json())
       .then(data => setProdutosPostados(data))
       .catch(err => console.error("Erro ao buscar produtos", err));
@@ -54,7 +54,7 @@ export default function Perfil() {
   const isAdmin = usuarioLogado.tipo === 'admin';
 
   function salvarEdicao() {
-    fetch(`http://localhost:5000/usuarios/${usuarioLogado.id}`, {
+    fetch(`http://localhost:5000/cozinheiros/${usuarioLogado.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function Perfil() {
         if (data.mensagem) {
           setPerfil(prev => ({ ...prev, nome: novoNome, email: novoEmail }));
           const novoLocal = { ...usuarioLogado, nome: novoNome, email: novoEmail };
-          localStorage.setItem('usuario', JSON.stringify(novoLocal));
+          localStorage.setItem('cozinheiro', JSON.stringify(novoLocal));
           setUsuarioLogado(novoLocal);
           setEditando(false);
         }
@@ -129,7 +129,7 @@ export default function Perfil() {
           </button>
 
           {isMeuPerfil && !editando && (
-            <button onClick={() => setEditando(true)} className="botao-perfil" style={{ backgroundColor: '#17a2b8' }}>
+            <button onClick={() => setEditando(true)} className="botao-perfil" style={{ backgroundColor: '#6f42c1' }}>
               Editar Informações
             </button>
           )}
@@ -137,14 +137,14 @@ export default function Perfil() {
       </div>
 
       <div className="produtosPostados" style={{ background: '#eee', padding: '20px', marginTop: '30px' }}>
-        <h2>Produtos Postados</h2>
+        <h2>Pratos Postados</h2>
 
         {produtosPostados.length === 0 ? (
-          <p>Nenhum produto postado ainda.</p>
+          <p>Nenhum prato postado ainda.</p>
         ) : (
           <div className="lista-produtos">
             {produtosPostados.map(produto => (
-              <div key={produto.id} className="card-produto" onClick={() => navigate(`/produto/${produto.id}`)}>
+              <div key={produto.id} className="card-produto" onClick={() => navigate(`/pratos/${produto.id}`)}>
                 <img src={produto.imagem_url} alt={produto.nome} className="imagem-produto" />
                 <h3>{produto.nome}</h3>
                 <p>Preço: R$ {produto.preco.toFixed(2)}</p>

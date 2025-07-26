@@ -17,9 +17,9 @@ export default function Login() {
       .then(res => res.json())
       .then(data => {
         alert(data.mensagem || data.erro);
-        if (data.usuario) {
+        if (data.cozinheiro) {
           // Salva usuário no localStorage como string JSON
-          localStorage.setItem('usuario', JSON.stringify(data.usuario));
+          localStorage.setItem('cozinheiro', JSON.stringify(data.cozinheiro));
           navigate('/paginaInicial');
         }
       })
